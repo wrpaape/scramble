@@ -1,7 +1,10 @@
 defmodule Scramble do
+  @reg_ws ~r{\s+}
   
-  @dict "/usr/share/dict/words"
-  |> File.read!
+  defp dict do
+   "/usr/share/dict/words"
+   |> File.read!
+  end
 
   def scan_by_length(len) do
     "\\b\\w{"
@@ -20,19 +23,25 @@ defmodule Scramble do
     split_string =
       incomplete
       |> String.split
-
-    ~r{(\s+)}
-    |> Regex.replace(incomplete, fn(_cap, cap) ->
-     "(\\w{" <> Integer.to_string(byte_size(cap)) <> "})" 
+    
+    @reg_ws
+    |> Regex.replace(incomplete, fn(cap0, _cap1) ->
+     "(\\w{" <> Integer.to_string(byte_size(cap0)) <> "})" 
     end)
+    |> cap("\\b", "(\\b)") 
     |> Regex.compile!
-    |> Regex.scan(@dict, capture: :all_but_first)
+    |> Regex.scan(dict, capture: :all_but_first)
     |> Enum.map_join("\n", fn(blanks) ->
       split_string
       |> Enum.zip(blanks)
       |> Enum.map_join(fn({comp, blank}) ->
-        comp <> IO.ANSI.red <> blank <> IO.ANSI.normal
+        IO.ANSI.white <> comp <> IO.ANSI.red <> blank
       end)
     end)
+    |> IO.puts
   end
+
+  defp cap(string, lcap, rcap), do: lcap <> string <> rcap
+  defp cap(string, cap),        do: cap <> string <> cap
+
 end
