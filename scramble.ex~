@@ -3,10 +3,10 @@ defmodule Scramble do
   @dict "/usr/share/dict/words"
   |> File.read!
 
-  def by_length(len) do
-    "(?<=\n)\w{"
+  def scan_by_length(len) do
+    "\\b\\w{"
     <> Integer.to_string(len)
-    <> "}(?=\n)"
+    <> "}\\b"
     |> Regex.compile!
     |> Regex.scan(@dict)
     |> Enum.with_index
@@ -16,4 +16,23 @@ defmodule Scramble do
     |> IO.puts
   end
 
+  def complete(incomplete) do
+    split_string =
+      incomplete
+      |> String.split
+
+    ~r{(\s+)}
+    |> Regex.replace(incomplete, fn(_cap, cap) ->
+     "(\\w{" <> Integer.to_string(byte_size(cap)) <> "})" 
+    end)
+    |> Regex.compile!
+    |> Regex.scan(@dict, capture: :all_but_first)
+    |> Enum.map_join("\n", fn(blanks) ->
+      split_string
+      |> Enum.zip(blanks)
+      |> Enum.map_join(fn({comp, blank} ->
+        comp <> IO.ANSI.red <> blank <> IO.ANSI.normal
+      end)
+    end)
+  end
 end
