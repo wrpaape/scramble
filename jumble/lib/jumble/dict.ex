@@ -4,27 +4,40 @@ defmodule Jumble.Dict do
   #   __MODULE__
   #   |> Module.register_attribute(attr, persist: true)
   # end)
-  @dict "/usr/share/dict/words"
-    |> File.read!
-    |> String.split
-  
-  @dict_codepoints @dict
-  "/usr/share/dict/words"
-    |> File.read!
-    |> String.split
-    |> Enum.group_by(fn(string) ->
-      string
-      |> String.codepoints
-      |> Enum.sort
+  @dict File.read!("/usr/share/dict/words")
+
+  def scan_dict(lengths) do
+    lengths
+    |> Enum.uniq
+    |> Enum.map_join("|",fn(length) ->
+      length
+      |> Integer.to_string
+      |> cap("\\w{", "}")
     end)
+    |> cap("\\b(", ")\\b")
+  end
 
-  @dict_length @dict
-    |> Enum.group_by(fn(string) ->
-      string
-      |> String.length
-    end)
 
-  defstruct codepoints: @dict_codepoints, length: @dict_length 
+  def start_link([final_lengths | jumbles]) do
+    length_map =
+      final_lengths
+      |> scan_dict
+      |> Enum.group_by(&byte_size/1)
 
-  # def test, do: [@dict_codepoints[~w(e h l l o)], @dict_length[10]]
+    codepoints_map =
+      jumbles
+      |> Enum.map(&byte_size/1)
+      |> scan_dict
+      |> Enum.group_by(fn(string) ->
+        string
+        |> String.codepoints
+        |> Enum.sort
+      end)
+
+    Map
+    |> Agent.start_link(:merge, [length_map, jumbles], name: __MODULE__)
+  end
+
+  defp cap(string, lcap, rcap), do: lcap <> string <> rcap
+  defp cap(string, cap)         do: cap  <> string <> cap
 end
