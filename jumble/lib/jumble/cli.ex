@@ -21,7 +21,7 @@ defmodule Jumble.CLI do
 
   def process(args) do
     args
-    |> Dict.start_link
+    |> LengthDict.start_link
     |> Jumble.solve
   end
 
@@ -35,24 +35,38 @@ defmodule Jumble.CLI do
 
       {_, [_ | []], _}      -> :help
       
-      {_, [final_lengths_string | jumbles], _} ->
-        final_lengths =
-          final_lengths_string
-          |> parse_ints
+      {_, [clue_string | jumbles_string], _} ->
+        {clue, final_lengths} =
+          clue_string
+          |> String.replace(~r{-}, " ")
+          |> parse_arg_string
 
-        jumbles_map =
-          jumbles
-          |> Enum.map(fn(jumble) ->
-            [word, key_pos] =
-              jumble
-              |> String.split(~r{/}, parts: 2)
+        jumbles_string
+        |> Enum.map(fn(jumble) ->
+          {word, keys_at} =
+            jumble
+            |> parse_arg_string
 
-            {word, parse_ints(key_pos)}
-          end)
-          |> Enum.into(Map.new)
+          jumble_map =
+            Map.new
+            |> Map.put_new(:length, byte_size(word))
+            |> Map.put_new(:string_id, Jumble.string_id(word))
+            |> Map.put_new(:keys_at, keys_at)
 
-        {final_lengths, jumbles_map}
+          {word, jumble_map}
+        end)
+        |> Enum.into(Map.new)
+        |> Map.put_new(:clue, clue)
+        |> Map.put_new(:final_lengths, final_lengths)
     end
+  end
+
+  def parse_arg_string(arg_string) do
+    [arg, ints_string]
+    string
+    |> String.split(~r{/}, parts: 2)
+
+    {arg, parse_ints(ints_string)}
   end
 
   def parse_ints(string) do
