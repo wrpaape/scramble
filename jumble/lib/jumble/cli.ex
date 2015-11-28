@@ -1,4 +1,6 @@
 defmodule Jumble.CLI do
+  alias Jumble.Dict
+
   def main(argv) do
     argv
     |> parse_args
@@ -15,7 +17,7 @@ defmodule Jumble.CLI do
   end
 
   def process([final | jumbles]) do
-    IO.inspect :timer.tc(&Jumble.test/0)
+    IO.inspect :timer.tc(IO, :inspect, [%Dict{}.length])
   end
 
   def parse_args(argv) do
