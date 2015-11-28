@@ -6,38 +6,13 @@ defmodule Jumble.LengthDict do
     |> Agent.get(Map, :get, [key])
   end
 
-  def take(keys) do
-    __MODULE__
-    |> Agent.get(Map, :take, [keys])
-  end
-
   def start_link(args = {final_lengths, jumbles_map}) do
-    # length_map =
-    #   final_lengths
-    #   |> scan_dict
-    #   |> Enum.group_by(fn([word]) ->
-    #     word
-    #     |> byte_size
-    #   end)
-
-    # codepoints_map =
-    #   jumbles_map
-    #   |> Enum.map(fn({jumble, _key_pos}) ->
-    #     jumble
-    #     |> byte_size
-    #   end)
-    #   |> scan_dict
-    #   |> Enum.group_by(fn([word]) ->
-    #     word
-    #     |> Jumble.codepoints_key
-    #   end)
-    
-      uniq_lengths = jumbles_map
-        |> Enum.map(fn({_jumble, %{length: length}}) ->
-          length
-        end)
-        |> Enum.into(final_lengths)
-        |> Enum.uniq
+    uniq_lengths = jumbles_map
+      |> Enum.map(fn({_jumble, %{length: length}}) ->
+        length
+      end)
+      |> Enum.into(final_lengths)
+      |> Enum.uniq
 
   
 

@@ -5,6 +5,10 @@ defmodule Jumble do
   def solve(args = {final_lengths, jumbles_map}) do
     jumbles_map
     |> Enum.map_join("\n\n", fn({jumble, %{length: length, string_id: string_id, keys_at: keys_at}}) ->
+      reg =
+        length
+        |> reg_keys(keys_at)
+
       jumble_sols =
         length
         |> LengthDict.get
@@ -12,11 +16,14 @@ defmodule Jumble do
           string_id(word) == string_id
         end)
         |> Enum.with_index
-        |> Enum.map_join("\n", fn({solution, index}) ->
+        |> Enum.map_join("\n", fn({unjumbled, index}) ->
+          {keys, color_coded}
+            unjumbled
+            |> color_code(reg)
+
           index + 1
           |> String.to_integer
           |> cap(pad(2), ". ")
-          <> color_code(solution, keys_at)
         end)
 
       jumble
@@ -34,8 +41,23 @@ defmodule Jumble do
   #   end)
   # end
 
-  def color_code_fun(length, keys_at) do
-
+  def reg_keys(length, keys_at) do
+  # f = fn(length, keys_at) ->
+    raw = 
+      1..length
+      |> Enum.map_join(fn(index) ->
+        if index in keys_at, do: "(\\w)", else: "\\w"
+      end)
+    
+    ~r/[^()]{4,}/
+    |> Regex.replace(raw, fn(ws) ->
+      ws
+      |> byte_size
+      |> div(2)
+      |> Integer.to_string
+      |> cap("\\w{", "}")
+    end)
+    |> Regex.compile!
   end
 
   def string_id(string) do
