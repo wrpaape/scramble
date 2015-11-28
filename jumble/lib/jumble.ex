@@ -1,34 +1,38 @@
 defmodule Jumble do
+  alias Jumble.Solver
   alias Jumble.LengthDict
   alias IO.ANSI
 
-  def solve(args = {final_lengths, jumbles_map}) do
-    jumbles_map
-    |> Enum.map_join("\n\n", fn({jumble, %{length: length, string_id: string_id, keys_at: keys_at}}) ->
-      reg =
-        length
-        |> reg_keys(keys_at)
+  @major_spacer "\n\n" <> ANSI.white
+  @minor_spacer "\n  " <> ANSI.green
 
-      jumble_sols =
-        length
-        |> LengthDict.get
-        |> Enum.filter(fn(word) -> 
-          string_id(word) == string_id
-        end)
-        |> Enum.with_index
-        |> Enum.map_join("\n", fn({unjumbled, index}) ->
-          {keys, color_coded}
-            unjumbled
-            |> color_code(reg)
+  def solve(%{jumble_maps: jumble_maps}) do
+    jumbles = 
+      jumble_maps
+      |> Enum.map_join(@major_spacer, fn({jumble, %{length: length, string_id: string_id, keys_at: keys_at}}) ->
+        reg =
+          length
+          |> reg_keys(keys_at)
 
-          index + 1
-          |> String.to_integer
-          |> cap(pad(2), ". ")
-        end)
+        unjumbled_rows =
+          length
+          |> LengthDict.get
+          |> Enum.filter(fn(word) -> 
+            string_id(word) == string_id
+          end)
+          |> Enum.with_index
+          |> Enum.map_join(@minor_spacer, fn({unjumbled, index}) ->
+            jumble
+            |> unjumbled_row(unjumbled, index + 1, reg)
+          end)
 
-      jumble
-      |> cap(ANSI.white, "\n" <> jumble_sols)
-    end)
+        @minor_spacer
+        |> cap(jumble, unjumbled_rows)
+      end)
+
+    @major_spacer
+    |> cap("JUMBLES:", jumbles)
+    |> IO.puts
   end
 
   # def color_code(solution, keys_at) do
@@ -40,6 +44,23 @@ defmodule Jumble do
   #     <> if index in keys_at, do: cap(letter, ANSI.red, ANSI.white), else: letter
   #   end)
   # end
+
+  def unjumbled_row(jumble, unjumbled, row_index, reg) do
+    key_letters =
+      reg
+      |> Regex.run(unjumbled, capture: :all_but_first)
+
+    reg
+    |> Regex.split(unjumbled, on: :all_but_first)
+
+      unjumbled
+      |> color_code(reg)
+
+    row_index
+    |> String.to_integer
+    |> cap(, ". ")
+    |> cap(ANSI.)
+  end
 
   def reg_keys(length, keys_at) do
   # f = fn(length, keys_at) ->
