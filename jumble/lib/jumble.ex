@@ -12,7 +12,7 @@ defmodule Jumble do
       |> Enum.map_join(@major_spacer, fn({jumble, %{length: length, string_id: string_id, keys_at: keys_at}}) ->
         reg =
           length
-          |> reg_keys(keys_at)
+          |> reg_key_letters(keys_at)
 
         unjumbled_rows =
           length
@@ -50,19 +50,29 @@ defmodule Jumble do
       reg
       |> Regex.run(unjumbled, capture: :all_but_first)
 
-    reg
-    |> Regex.split(unjumbled, on: :all_but_first)
+    jumble
+    |> Solver.push_unjumbled(unjumbled, key_letters)
 
-      unjumbled
-      |> color_code(reg)
+    color_coded = 
+      reg
+      |> Regex.split(unjumbled, on: :all_but_first)
+      |> color_code(key_letters)
 
-    row_index
-    |> String.to_integer
-    |> cap(, ". ")
-    |> cap(ANSI.)
+    ". "
+    |> cap(Integer.to_string(row_index), color_coded)
   end
 
-  def reg_keys(length, keys_at) do
+  def color_code([excess_head | excess_rest], key_letters) do
+    key_letters
+    |> Enum.zip(excess_rest)
+    |> Enum.reduce(ANSI.white <> excess_head, fn({key, excess}, acc) ->
+      key
+      |> cap(ANSI.red, ANSI.white)
+      |> cap(acc, excess)
+    end)
+  end
+
+  def reg_key_letters(length, keys_at) do
   # f = fn(length, keys_at) ->
     raw = 
       1..length
