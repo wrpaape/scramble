@@ -68,9 +68,9 @@ defmodule Jumble.CLI do
   end
 
   def parse_arg_string(arg_string) do
-    [arg, ints_string]
-    string
-    |> String.split(~r{/}, parts: 2)
+    [arg, ints_string] =
+      arg_string
+      |> String.split(~r{/}, parts: 2)
 
     {arg, parse_ints(ints_string)}
   end

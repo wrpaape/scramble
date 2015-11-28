@@ -4,7 +4,9 @@ defmodule Jumble do
   alias IO.ANSI
 
   @major_spacer "\n\n" <> ANSI.white
-  @minor_spacer "\n  " <> ANSI.green
+  @minor_spacer "\n  " <> ANSI.yellow
+  @cc_spacer      ". " <> ANSI.red
+  @header ANSI.underline <> ANSI.cyan <> "JUMBLES:\n" <> ANSI.no_underline <> ANSI.white
 
   def solve(%{jumble_maps: jumble_maps}) do
     jumbles = 
@@ -30,8 +32,8 @@ defmodule Jumble do
         |> cap(jumble, unjumbled_rows)
       end)
 
-    @major_spacer
-    |> cap("JUMBLES:", jumbles)
+    @header
+    <> jumbles
     |> IO.puts
   end
 
@@ -58,16 +60,16 @@ defmodule Jumble do
       |> Regex.split(unjumbled, on: :all_but_first)
       |> color_code(key_letters)
 
-    ". "
+    @cc_spacer
     |> cap(Integer.to_string(row_index), color_coded)
   end
 
   def color_code([excess_head | excess_rest], key_letters) do
     key_letters
     |> Enum.zip(excess_rest)
-    |> Enum.reduce(ANSI.white <> excess_head, fn({key, excess}, acc) ->
+    |> Enum.reduce(excess_head, fn({key, excess}, acc) ->
       key
-      |> cap(ANSI.red, ANSI.white)
+      |> cap(ANSI.red, ANSI.green)
       |> cap(acc, excess)
     end)
   end

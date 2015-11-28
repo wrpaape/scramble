@@ -10,7 +10,7 @@ defmodule Jumble.Solver do
     end
 
     __MODULE__
-    |> Agent.cast(Map, :update!, [jumble, push])
+    |> Agent.cast(Kernel, :update_in, [[:jumble_maps, jumble, :unjumbleds], push])
   end
 
   def start_link(args) do
@@ -20,7 +20,7 @@ defmodule Jumble.Solver do
     end
 
     Map
-    |> Agent.start_link(:update!, [:jumble_maps, into_map], name: __MODULE__)
+    |> Agent.start_link(:update!, [args, :jumble_maps, into_map], name: __MODULE__)
 
     args
   end

@@ -7,7 +7,8 @@ defmodule Jumble.LengthDict do
   end
 
   def start_link(%{final_lengths: final_lengths, jumble_maps: jumble_maps} = args) do
-    uniq_lengths = jumble_maps
+    uniq_lengths =
+      jumble_maps
       |> Enum.map(fn({_jumble, %{length: length}}) ->
         length
       end)
@@ -20,7 +21,7 @@ defmodule Jumble.LengthDict do
     args
   end
 
-  defp build_dict(lengths) do
+  def build_dict(lengths) do
     lengths
     |> Enum.map_join("|",fn(length) ->
       length
@@ -30,9 +31,7 @@ defmodule Jumble.LengthDict do
     |> Jumble.cap("\\b(", ")\\b")
     |> Regex.compile!
     |> Regex.scan(@dict, capture: :all_but_first)
-    |> Enum.group_by(fn([word]) ->
-      word
-      |> byte_size
-    end)
+    |> List.flatten
+    |> Enum.group_by(&byte_size/1)
   end
 end
