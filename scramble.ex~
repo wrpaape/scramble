@@ -21,14 +21,14 @@ defmodule Scramble do
 
   def complete(incomplete) do
     split_string =
-      @reg_ws
-      |> Regex.split(incomplete)
+      incomplete
+      |> String.split
     
     @reg_ws
     |> Regex.replace(incomplete, fn(cap0, _cap1) ->
      "(\\w{" <> Integer.to_string(byte_size(cap0)) <> "})" 
     end)
-    |> String.replace(~r{^|$}, "\\b") 
+    |> cap("\\b", "(\\b)") 
     |> Regex.compile!
     |> Regex.scan(dict, capture: :all_but_first)
     |> Enum.map_join("\n", fn(blanks) ->
@@ -41,7 +41,7 @@ defmodule Scramble do
     |> IO.puts
   end
 
-  #defp cap(string, lcap, rcap), do: lcap <> string <> rcap
-  #defp cap(string, cap), do: cap <> string <> cap
+  defp cap(string, lcap, rcap), do: lcap <> string <> rcap
+  defp cap(string, cap),        do: cap <> string <> cap
 
 end

@@ -6,6 +6,11 @@ defmodule Jumble.Dict do
     |> Agent.get(Map, :get, [key])
   end
 
+  def take(keys) do
+    __MODULE__
+    |> Agent.get(Map, :take, [keys])
+  end
+
   def start_link(args = {final_lengths, jumbles_map}) do
     length_map =
       final_lengths
@@ -24,8 +29,7 @@ defmodule Jumble.Dict do
       |> scan_dict
       |> Enum.group_by(fn([word]) ->
         word
-        |> String.codepoints
-        |> Enum.sort
+        |> Jumble.codepoints_key
       end)
 
     Map
@@ -48,5 +52,4 @@ defmodule Jumble.Dict do
   end
 
   defp cap(string, lcap, rcap), do: lcap <> string <> rcap
-  # defp cap(string, cap),        do: cap  <> string <> cap
 end
