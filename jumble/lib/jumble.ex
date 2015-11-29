@@ -13,7 +13,7 @@ defmodule Jumble do
     jumbles = 
       jumble_maps
       |> Enum.map_join(@jumble_spacer, fn({jumble, %{jumble_index: jumble_index, length: length, string_id: string_id, keys_at: keys_at}}) ->
-        reg =
+        reg_match_keys =
           length
           |> reg_key_letters(keys_at)
 
@@ -26,7 +26,7 @@ defmodule Jumble do
           |> Helper.with_index(1)
           |> Enum.map_join(@unjumbled_spacer, fn({unjumbled, index}) ->
             jumble
-            |> unjumbled_row(unjumbled, index, reg)
+            |> unjumbled_row(unjumbled, index, reg_match_keys)
           end)
 
         @unjumbled_spacer
@@ -41,15 +41,15 @@ defmodule Jumble do
     |> IO.puts
   end
 
-  def unjumbled_row(jumble, unjumbled, unjumbled_index, reg) do
+  def unjumbled_row(jumble, unjumbled, unjumbled_index, reg_match_keys) do
     key_letters =
-      reg
+      reg_match_keys
       |> Regex.run(unjumbled, capture: :all_but_first)
 
     jumble
     |> Solver.push_unjumbled(unjumbled, key_letters)
 
-    reg
+    reg_match_keys
     |> Regex.split(unjumbled, on: :all_but_first)
     |> color_code(key_letters)
     |> number_string(unjumbled_index, @cc_spacer)
@@ -88,7 +88,5 @@ defmodule Jumble do
     Integer.to_string(index_string)
     <> spacer
     <> string
-    # spacer
-    # |> Helper.cap(Integer.to_string(index_string), string)
   end
 end

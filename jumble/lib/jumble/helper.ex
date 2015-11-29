@@ -11,7 +11,8 @@ defmodule Jumble.Helper do
   # def pad(pad_length), do: String.duplicate(" ", pad_length)
 
   def with_index(collection, initial) do
-    Enum.map_reduce(collection, initial, fn(x, acc) ->
+    collection
+    |> Enum.map_reduce(initial, fn(x, acc) ->
       {{x, acc}, acc + 1}
     end)
     |> elem(0)
