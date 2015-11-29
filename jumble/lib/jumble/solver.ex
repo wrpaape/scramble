@@ -3,7 +3,7 @@ defmodule Jumble.Solver do
   #   __MODULE__
   #   |> Agent.get(Map, :get, [key])
   # end
-  alias Jumble.Generate
+  # alias Jumble.Generate
 
 
   def solve do

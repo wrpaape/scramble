@@ -1,4 +1,5 @@
 defmodule Jumble do
+  alias Jumble.Helper
   alias Jumble.Solver
   alias Jumble.LengthDict
   alias IO.ANSI
@@ -6,7 +7,7 @@ defmodule Jumble do
   @jumble_spacer    "\n\n" <> ANSI.white
   @unjumbled_spacer "\n  " <> ANSI.yellow
   @cc_spacer          ". " <> ANSI.red
-  @header ANSI.underline <> ANSI.cyan <> "JUMBLES:\n" <> ANSI.no_underline <> ANSI.white
+  @header   ANSI.underline <> ANSI.cyan <> "JUMBLES:\n" <> ANSI.no_underline <> ANSI.white
 
   def start(%{jumble_maps: jumble_maps}) do
     jumbles = 
@@ -20,16 +21,16 @@ defmodule Jumble do
           length
           |> LengthDict.get
           |> Enum.filter(fn(word) -> 
-            string_id(word) == string_id
+            Helper.string_id(word) == string_id
           end)
-          |> Enum.with_index
+          |> Helper.with_index(1)
           |> Enum.map_join(@unjumbled_spacer, fn({unjumbled, index}) ->
             jumble
-            |> unjumbled_row(unjumbled, index + 1, reg)
+            |> unjumbled_row(unjumbled, index, reg)
           end)
 
         @unjumbled_spacer
-        |> cap(jumble, unjumbled_rows)
+        |> Helper.cap(jumble, unjumbled_rows)
         |> number_string(jumble_index, ". ")
       end)
 
@@ -59,8 +60,8 @@ defmodule Jumble do
     |> Enum.zip(excess_rest)
     |> Enum.reduce(excess_head, fn({key, excess}, acc) ->
       key
-      |> cap(ANSI.red, ANSI.green)
-      |> cap(acc, excess)
+      |> Helper.cap(ANSI.red, ANSI.green)
+      |> Helper.cap(acc, excess)
     end)
   end
 
@@ -77,24 +78,17 @@ defmodule Jumble do
       |> byte_size
       |> div(2)
       |> Integer.to_string
-      |> cap("\\w{", "}")
+      |> Helper.cap("\\w{", "}")
     end)
     |> Regex.compile!
   end
 
-  def string_id(string) do
-    string
-    |> String.to_char_list
-    |> Enum.sort
-  end
 
   def number_string(string, index_string, spacer) do
-    spacer
-    |> cap(Integer.to_string(index_string), string)
+    Integer.to_string(index_string)
+    <> spacer
+    <> string
+    # spacer
+    # |> Helper.cap(Integer.to_string(index_string), string)
   end
-
-  def cap(string, lcap, rcap), do: lcap <> string <> rcap
-  def cap(string, cap),        do:  cap <> string <> cap
-
-  def pad(pad_length), do: String.duplicate(" ", pad_length)
 end

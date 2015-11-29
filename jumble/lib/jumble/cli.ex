@@ -2,6 +2,7 @@ defmodule Jumble.CLI do
   @parse_opts [switches: [ help: :boolean],
                aliases:  [ h:    :help   ]]
 
+  alias Jumble.Helper
   alias Jumble.Solver
   alias Jumble.LengthDict
 
@@ -47,7 +48,7 @@ defmodule Jumble.CLI do
 
         jumble_maps =
           jumble_strings
-          |> Enum.with_index
+          |> Helper.with_index(1)
           |> Enum.map(fn({jumble_string, index}) ->
             {jumble, keys_at} =
               jumble_string
@@ -55,9 +56,9 @@ defmodule Jumble.CLI do
 
             jumble_map =
               Map.new
-              |> Map.put_new(:jumble_index, index + 1)
+              |> Map.put_new(:jumble_index, index)
               |> Map.put_new(:length, byte_size(jumble))
-              |> Map.put_new(:string_id, Jumble.string_id(jumble))
+              |> Map.put_new(:string_id, Helper.string_id(jumble))
               |> Map.put_new(:keys_at, keys_at)
               |> Map.put_new(:unjumbleds, [])
 

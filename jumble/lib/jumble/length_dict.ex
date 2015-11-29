@@ -1,6 +1,8 @@
 defmodule Jumble.LengthDict do
   @dict File.read!("/usr/share/dict/words")
 
+  alias Jumble.Helper
+  
   def get(length_word) do
     __MODULE__
     |> Agent.get(Map, :get, [length_word])
@@ -26,9 +28,9 @@ defmodule Jumble.LengthDict do
     |> Enum.map_join("|",fn(length) ->
       length
       |> Integer.to_string
-      |> Jumble.cap("\\w{", "}")
+      |> Helper.cap("\\w{", "}")
     end)
-    |> Jumble.cap("\\b(", ")\\b")
+    |> Helper.cap("\\b(", ")\\b")
     |> Regex.compile!
     |> Regex.scan(@dict, capture: :all_but_first)
     |> List.flatten
