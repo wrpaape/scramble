@@ -35,21 +35,22 @@ defmodule Jumble.Solver do
 
   def solve(%{clue: clue, final_lengths: final_lengths, jumble_maps: jumble_maps}) do
     jumble_maps
-    # |> Enum.sort_by(fn({_jumble, %{jumble_index: jumble_index}}) ->
-    #   jumble_index
-    # end)
+    |> Enum.sort_by(fn({_jumble, %{jumble_index: jumble_index}}) ->
+      jumble_index
+    end)
     |> Enum.map(fn({jumble, %{unjumbleds: unjumbleds}}) ->
       unjumbleds
     end)
     |> Helper.combinations
-    |> Enum.map(fn(answers) ->
-      answers
-      |> Enum.flat_map_reduce("", fn({unjumbled, key_letters}, acc) ->
-        {key_letters, acc <> "\n" <> unjumbled}
-      end)
-    end)
-    |> Enum.
     |> IO.inspect
+    # |> Enum.map(fn(answers) ->
+    #   answers
+    #   |> Enum.flat_map_reduce("", fn({unjumbled, key_letters}, acc) ->
+    #     {key_letters, acc <> "\n" <> unjumbled}
+    #   end)
+    # end)
+    # |> Helper.permutations
+    # |> IO.inspect
   end
 end
 
