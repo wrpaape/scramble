@@ -3,7 +3,7 @@ defmodule Jumble.Solver do
   #   __MODULE__
   #   |> Agent.get(Map, :get, [key])
   # end
-  # alias Jumble.Generate
+  alias Jumble.Helper
 
 
   def solve do
@@ -35,7 +35,39 @@ defmodule Jumble.Solver do
 
   def solve(%{clue: clue, final_lengths: final_lengths, jumble_maps: jumble_maps}) do
     jumble_maps
+    # |> Enum.sort_by(fn({_jumble, %{jumble_index: jumble_index}}) ->
+    #   jumble_index
+    # end)
+    |> Enum.map(fn({jumble, %{unjumbleds: unjumbleds}}) ->
+      unjumbleds
+    end)
+    |> Helper.combinations
+    |> Enum.map(fn(answers) ->
+      answers
+      |> Enum.flat_map_reduce("", fn({unjumbled, key_letters}, acc) ->
+        {key_letters, acc <> "\n" <> unjumbled}
+      end)
+    end)
+    |> Enum.
     |> IO.inspect
-    # |> Generate.char_pools
   end
 end
+
+# 3 / 4 / 4
+# ["y", "w", "e", "j", "o", "l", "n", "d", "b", "e", "a"]
+
+# [[{"yawler", ["y", "w", "e"]}, {"major", ["j", "o"]},
+#   {"gland", ["l", "n", "d"]}, {"becalm", ["b", "e", "a"]}],
+#  [{"lawyer", ["l", "w", "e"]}, {"major", ["j", "o"]},
+#   {"gland", ["l", "n", "d"]}, {"becalm", ["b", "e", "a"]}]]
+
+
+# %{"camble" => %{jumble_index: 3, keys_at: [1, 2, 4], length: 6,
+#     string_id: 'abcelm', unjumbleds: [{"becalm", ["b", "e", "a"]}]},
+#   "nagld" => %{jumble_index: 1, keys_at: [2, 4, 5], length: 5,
+#     string_id: 'adgln', unjumbleds: [{"gland", ["l", "n", "d"]}]},
+#   "ramoj" => %{jumble_index: 2, keys_at: [3, 4], length: 5, string_id: 'ajmor',
+#     unjumbleds: [{"major", ["j", "o"]}]},
+#   "wraley" => %{jumble_index: 4, keys_at: [1, 3, 5], length: 6,
+#     string_id: 'aelrwy',
+#     unjumbleds: [{"lawyer", ["l", "w", "e"]}, {"yawler", ["y", "w", "e"]}]}}

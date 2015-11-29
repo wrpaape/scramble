@@ -57,34 +57,21 @@
 # # lol = [[1, 2, 3], [-5, -4]]
 # Foo.combine(lol)
 
-defmodule Foo do
-  # def combine(list1, list2, list3) do
-  #   list1
-  #   |> Enum.reduce([], fn(el1, acc) ->
-  #     list2
-  #     |> Enum.reduce(acc, fn(el2, acc) ->
-  #       list3
-  #       |> Enum.reduce(acc, fn(el3, acc) ->
-  #         [[el1, el2, el3] | acc]
-  #       end)
-  #     end)
-  #   end)
-  # end
+# defmodule Foo do
+#   def combinations([last_list | []], els, acc) do
+#     last_list
+#     |> Enum.reduce(acc, fn(last_el, last_acc) ->
+#       [[last_el | els] | last_acc]
+#     end)
+#   end
 
-  def combine([last_list | []], els, acc) do
-    last_list
-    |> Enum.reduce(acc, fn(last_el, last_acc) ->
-      [[last_el | els] | last_acc]
-    end)
-  end
-
-  def combine([head_list | tail_lists], els \\ [], acc \\ []) do
-    head_list
-    |> Enum.reduce(acc, fn(el, next_acc) ->
-      combine(tail_lists, [el | els], next_acc)
-    end)
-  end
-end
+#   def combinations([head_list | tail_lists], els \\ [], acc \\ []) do
+#     head_list
+#     |> Enum.reduce(acc, fn(el, next_acc) ->
+#       combinations(tail_lists, [el | els], next_acc)
+#     end)
+#   end
+# end
 
 
 
