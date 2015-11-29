@@ -55,7 +55,7 @@ defmodule Jumble.Solver do
 end
 
 # 3 / 4 / 4
-# ["y", "w", "e", "j", "o", "l", "n", "d", "b", "e", "a"]
+# ["l", "w", "e", "j", "o", "l", "n", "d", "b", "e", "a"]
 
 # [[{"yawler", ["y", "w", "e"]}, {"major", ["j", "o"]},
 #   {"gland", ["l", "n", "d"]}, {"becalm", ["b", "e", "a"]}],

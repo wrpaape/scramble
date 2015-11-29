@@ -9,7 +9,14 @@ defmodule Jumble.CLI do
   # def main(argv) do
     # argv
   def main do
-    ~w(when/the/acupuncture/worked/the/patient/said/it/was?3/4/4 nagld/2/4/5 ramoj/3/4 camble/1/2/4 wraley/1/3/5)
+    # ~w(when/the/acupuncture/worked/the/patient/said/it/was?3/4/4 nagld/2/4/5 ramoj/3/4 camble/1/2/4 wraley/1/3/5)
+    # job well done
+    # ~w(clue?9 tonji/2/5 zierp/1/3 babfly/1/2 rooman/3/4/5)
+    # portfolio
+    # ~w(clue?4/5 ylsyh/1/4 setgu/1/4 lasivu/1/3/5 nofdef/1/4)
+    # loss vegas
+    # ~w(clue?6/7 hnuck/1/2/3 turet/1/2/3 birsec/1/2/5/6 pajloy/1/4/6)
+    # touchy subject
     |> parse_args
     |> process
   end
