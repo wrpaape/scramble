@@ -3,15 +3,15 @@ defmodule Jumble do
   alias Jumble.LengthDict
   alias IO.ANSI
 
-  @major_spacer "\n\n" <> ANSI.white
-  @minor_spacer "\n  " <> ANSI.yellow
-  @cc_spacer      ". " <> ANSI.red
+  @jumble_spacer    "\n\n" <> ANSI.white
+  @unjumbled_spacer "\n  " <> ANSI.yellow
+  @cc_spacer          ". " <> ANSI.red
   @header ANSI.underline <> ANSI.cyan <> "JUMBLES:\n" <> ANSI.no_underline <> ANSI.white
 
-  def solve(%{jumble_maps: jumble_maps}) do
+  def start(%{jumble_maps: jumble_maps}) do
     jumbles = 
       jumble_maps
-      |> Enum.map_join(@major_spacer, fn({jumble, %{length: length, string_id: string_id, keys_at: keys_at}}) ->
+      |> Enum.map_join(@jumble_spacer, fn({jumble, %{jumble_index: jumble_index, length: length, string_id: string_id, keys_at: keys_at}}) ->
         reg =
           length
           |> reg_key_letters(keys_at)
@@ -23,31 +23,24 @@ defmodule Jumble do
             string_id(word) == string_id
           end)
           |> Enum.with_index
-          |> Enum.map_join(@minor_spacer, fn({unjumbled, index}) ->
+          |> Enum.map_join(@unjumbled_spacer, fn({unjumbled, index}) ->
             jumble
             |> unjumbled_row(unjumbled, index + 1, reg)
           end)
 
-        @minor_spacer
+        @unjumbled_spacer
         |> cap(jumble, unjumbled_rows)
+        |> number_string(jumble_index, ". ")
       end)
+
+    Solver.solve
 
     @header
     <> jumbles
     |> IO.puts
   end
 
-  # def color_code(solution, keys_at) do
-  #   solution
-  #   |> String.codepoints
-  #   |> Enum.with_index
-  #   |> Enum.reduce(ANSI.white, fn({letter, index}, acc) ->
-  #     acc
-  #     <> if index in keys_at, do: cap(letter, ANSI.red, ANSI.white), else: letter
-  #   end)
-  # end
-
-  def unjumbled_row(jumble, unjumbled, row_index, reg) do
+  def unjumbled_row(jumble, unjumbled, unjumbled_index, reg) do
     key_letters =
       reg
       |> Regex.run(unjumbled, capture: :all_but_first)
@@ -55,13 +48,10 @@ defmodule Jumble do
     jumble
     |> Solver.push_unjumbled(unjumbled, key_letters)
 
-    color_coded = 
-      reg
-      |> Regex.split(unjumbled, on: :all_but_first)
-      |> color_code(key_letters)
-
-    @cc_spacer
-    |> cap(Integer.to_string(row_index), color_coded)
+    reg
+    |> Regex.split(unjumbled, on: :all_but_first)
+    |> color_code(key_letters)
+    |> number_string(unjumbled_index, @cc_spacer)
   end
 
   def color_code([excess_head | excess_rest], key_letters) do
@@ -75,7 +65,6 @@ defmodule Jumble do
   end
 
   def reg_key_letters(length, keys_at) do
-  # f = fn(length, keys_at) ->
     raw = 
       1..length
       |> Enum.map_join(fn(index) ->
@@ -97,6 +86,11 @@ defmodule Jumble do
     string
     |> String.to_char_list
     |> Enum.sort
+  end
+
+  def number_string(string, index_string, spacer) do
+    spacer
+    |> cap(Integer.to_string(index_string), string)
   end
 
   def cap(string, lcap, rcap), do: lcap <> string <> rcap

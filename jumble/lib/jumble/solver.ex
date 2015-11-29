@@ -3,6 +3,13 @@ defmodule Jumble.Solver do
   #   __MODULE__
   #   |> Agent.get(Map, :get, [key])
   # end
+  alias Jumble.Generate
+
+
+  def solve do
+    __MODULE__
+    |> Agent.cast(&solve/1)
+  end
 
   def push_unjumbled(jumble, unjumbled, key_letters) do
     push = fn(unjumbleds) ->
@@ -23,5 +30,12 @@ defmodule Jumble.Solver do
     |> Agent.start_link(:update!, [args, :jumble_maps, into_map], name: __MODULE__)
 
     args
+  end
+
+
+  def solve(%{clue: clue, final_lengths: final_lengths, jumble_maps: jumble_maps}) do
+    jumble_maps
+    |> IO.inspect
+    # |> Generate.char_pools
   end
 end
